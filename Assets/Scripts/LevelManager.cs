@@ -13,20 +13,46 @@ public enum LevelState {
 
 public class LevelManager : MonoBehaviour {
 
+    public List<RoadController> _roads;
+
     private LevelState _levelState;
     private float _levelStartCountDown;
-    private Dictionary<EDirectionsPositions, RoadController> _roadsByPosition;
 
     private HoneyController _honeyController;
     private PlayerController _playerController;
 
+    private float _timeStamp;
+
+    private GameData _gameData;
+
     private void Awake() {
-        _roadsByPosition = new Dictionary<EDirectionsPositions, RoadController>();
+        _gameData = GameManager.GetPtr().GetGameData();
+
         _honeyController = FindObjectOfType<HoneyController>();
         _playerController = FindObjectOfType<PlayerController>();
     } // _roadsByPosition 
 
+    private void Update() {
+        if (IsLevelPlaying()) {
+            _timeStamp += Time.deltaTime;
+            if (_timeStamp > _gameData.TimeForSecondRoad && !_roads[1].gameObject.activeSelf)
+                _roads[1].StartRoad();
+
+            if (_timeStamp > _gameData.TimeForThirdRoad && !_roads[2].gameObject.activeSelf)
+                _roads[2].StartRoad();
+
+            if (_timeStamp > _gameData.TimeForForthRoad && !_roads[3].gameObject.activeSelf)
+                _roads[3].StartRoad();
+        }
+    } // Update
+
     public void StartLevel() {
+        _timeStamp = 0;
+        _roads[0].StartRoad();
+        _roads[1].FinishRoad();
+        _roads[2].FinishRoad();
+        _roads[3].FinishRoad();
+
         startCountDown();
     } // StartLevel
 
@@ -70,26 +96,25 @@ public class LevelManager : MonoBehaviour {
     /// <param name="pushStrength"></param>
     /// <returns></returns>
     public Vector3 Push(EDirectionsPositions pushDirection, float pushStrength) {
-        if (_roadsByPosition.ContainsKey(pushDirection)) {
-            RoadController roadController = _roadsByPosition[pushDirection];
-            _playerController.SetPushingItem(roadController.GetBear());
-
-            return roadController.PushBear(pushStrength);
-        } else {
-            _playerController.SetPushingItem(null);
-            return GetTemporalPositionForPlayer(pushDirection);
+        for (int i = 0; i < _roads.Count; i++) {
+            if (_roads[i].GetRoadPosition() == pushDirection) {
+                if (_roads[i].gameObject.activeSelf) {
+                    _playerController.SetPushingItem(_roads[i].GetBear());
+                    return _roads[i].PushBear(pushStrength);
+                } else {
+                    _playerController.SetPushingItem(null);
+                    return GetTemporalPositionForPlayer(pushDirection);
+                }
+            }
         }
+        _playerController.SetPushingItem(null);
+        return GetTemporalPositionForPlayer(pushDirection);
     } // Push
 
     private Vector3 GetTemporalPositionForPlayer(EDirectionsPositions pushDirection) {
         Debug.Log("set position close to honey depending of the pushDirection");
         return _honeyController.transform.position;
     } // GetTemporalPositionForPlayer
-
-    // road and push managemens
-    public void RegisterRoad(EDirectionsPositions roadPosition, RoadController roadController) {
-        _roadsByPosition.Add(roadPosition, roadController);
-    } // RegisterRoad
 
     /// gets
     public bool IsLevelStarted() {

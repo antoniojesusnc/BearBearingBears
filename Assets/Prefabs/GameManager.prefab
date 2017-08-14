@@ -67,8 +67,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LevelStartCountDownSeconds: 3
   HoneyRadious: 2
-  InitialBearSpeed: 2
+  BearInitialSpeed: 1
+  BearIncreaseSpeedRate: 1.1
+  BearIncreaseSpeedRateFrequency: 5
+  TimeForSecondBear: 0
+  TimeForThirdBear: 0
+  TimeForForthBear: 0
   MinPlayerPushStrength: 1
+  MinPlayerPushStrengthRateIncrease: 1.1
+  PlayerResetValueAfterSeconds: 0.5
 --- !u!114 &114696606369115180
 MonoBehaviour:
   m_ObjectHideFlags: 1

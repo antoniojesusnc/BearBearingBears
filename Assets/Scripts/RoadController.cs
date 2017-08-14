@@ -10,13 +10,19 @@ public class RoadController : MonoBehaviour {
 
     private BearController _bearOnRoad;
 
-    public void Start() {
-        GameManager.GetPtr().GetLevelManager().RegisterRoad(_roadPosition, this);
-
+    public void Awake() {
         _initialPosition = transform.Find("InitialBearPosition").transform.position;
+    } // Start
+
+    public void StartRoad() {
+        gameObject.SetActive(true);
         _bearOnRoad = GetComponentInChildren<BearController>();
         _bearOnRoad.transform.position = _initialPosition;
-    } // Start
+    } // StartRoad
+
+    public void FinishRoad() {
+        gameObject.SetActive(false);
+    } // FinishRoad
 
     /// <summary>
     /// Push the bear and return the new Bear Position
@@ -54,4 +60,8 @@ public class RoadController : MonoBehaviour {
     public BearController GetBear() {
         return _bearOnRoad;
     } // GetBear
+
+    public EDirectionsPositions GetRoadPosition() {
+        return _roadPosition;
+    } // GetRoadPosition
 }

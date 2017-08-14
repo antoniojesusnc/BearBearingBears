@@ -21,7 +21,7 @@ public class HoneyController : MonoBehaviourUpdate {
     public override void UpdateMethod(float deltaTime) {
         for (int i = _bearPositions.Count - 1; i >= 0; i--) {
             if (( _bearPositions[i].position - transform.position ).magnitude < _radious) {
-                Debug.LogWarning("End game");
+                GameManager.GetPtr().GetLevelManager().FinishLevel();
             }
         }
     } // UpdateMethod

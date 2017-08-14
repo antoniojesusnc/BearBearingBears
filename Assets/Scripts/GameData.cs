@@ -18,18 +18,30 @@ public class GameData : MonoBehaviour {
     public float HoneyRadious;
 
     [Header("Bear Data")]
-    public float InitialBearSpeed;
+    public float BearInitialSpeed;
+    public float BearIncreaseSpeedRate;
+    public float BearIncreaseSpeedRateFrequency;
+
+    public float TimeForSecondRoad;
+    public float TimeForThirdRoad;
+    public float TimeForForthRoad;
+
 
     [Header("Player Data")]
     public float MinPlayerPushStrength;
+    public float MinPlayerPushStrengthRateIncrease;
+    public float PlayerResetValueAfterSeconds;
 
 
+    public float GetBearSpeed(float timeBearMoving) {
+        if (timeBearMoving > BearIncreaseSpeedRate)
+            return BearInitialSpeed * Mathf.Pow(BearIncreaseSpeedRate, ( (int)timeBearMoving / (int)BearIncreaseSpeedRateFrequency ));
+
+        return BearInitialSpeed;
+    } // GetBearSpeed
 
     public float GetPlayerStrength(float timeWithSameDirection) {
-        // I have to find a equation for reward same direccion pushing
-        return MinPlayerPushStrength;
-
-        /// static methods
+        return MinPlayerPushStrength * Mathf.Pow(MinPlayerPushStrengthRateIncrease, timeWithSameDirection);
     } // GetPlayerStrength
 
     public static EDirectionsPositions GetOpositeDirection(EDirectionsPositions directionOrPoint) {

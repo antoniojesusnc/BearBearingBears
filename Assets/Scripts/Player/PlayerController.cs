@@ -6,32 +6,45 @@ using UnityEngine;
 public class PlayerController : MonoBehaviourUpdate {
 
     public float _pushStrength;
-    private float _timeWithSameDirection;
+    private int _timesPushSameDirection;
     private EDirectionsPositions _pushDirection;
 
     private PlayerState _playerState;
     private BearController _bearBeingPushed;
 
+    private GameData _gameData;
+
+    private float _timeStamp;
     // Use this for initialization
     void Start() {
+        _gameData = GameManager.GetPtr().GetGameData();
         _playerState = GetComponent<PlayerState>();
         _playerState.OnNewPush += OnPush;
     } // Start
 
     private void OnPush(EDirectionsPositions direction, bool isNewDirection) {
-        if (isNewDirection)
-            _timeWithSameDirection = 0;
+        if (isNewDirection) {
+            _timesPushSameDirection = 1;
+        } else {
+            ++_timesPushSameDirection;
+        }
 
-        _pushStrength = GameManager.GetPtr().GetGameData().GetPlayerStrength(_timeWithSameDirection);
+        _pushStrength = _gameData.GetPlayerStrength(_timesPushSameDirection);
         _pushDirection = direction;
 
         transform.position = GameManager.GetPtr().GetLevelManager().Push(_pushDirection, _pushStrength);
+        _timeStamp = 0;
     } // OnChangeState
 
     public override void UpdateMethod(float deltaTime) {
-        _timeWithSameDirection += deltaTime;
         if (_bearBeingPushed != null) {
             UpdatePlayerPosition();
+        }
+
+        _timeStamp += deltaTime;
+        if (_timeStamp > _gameData.PlayerResetValueAfterSeconds) {
+            _timeStamp = 0;
+            _timesPushSameDirection = 0;
         }
     } // UpdateMethod
 
